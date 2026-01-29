@@ -10,3 +10,6 @@ terraform.tfstate.backup
 # Secrets
 *.tfvars
 .aws/
+cd
+
+#pop
