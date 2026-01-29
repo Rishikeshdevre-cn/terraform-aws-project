@@ -1,14 +1,21 @@
 name: Terraform CI/CD
 
 on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
   workflow_dispatch:
     inputs:
       action:
-        description: "Terraform action (destroy only)"
+        description: "Terraform action (apply or destroy)"
         required: true
-        default: destroy
+        default: apply
         type: choice
         options:
+          - apply
           - destroy
 
 jobs:
@@ -35,32 +42,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # -------------------------------
-      # Terraform Init (REQUIRED)
-      # -------------------------------
       - name: Terraform Init
         run: terraform init
 
-      # -------------------------------
-      # Terraform Validate (DISABLED)
-      # -------------------------------
-      # - name: Terraform Validate
-      #   run: terraform validate
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: ${{ github.event.inputs.action != 'destroy' }}
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: ${{ github.ref == 'refs/heads/main' && github.event.inputs.action == 'apply' }}
+        run: terraform apply -auto-approve
 
       # -------------------------------
-      # Terraform Plan (DISABLED)
+      # Terraform Destroy (COMMENTED)
       # -------------------------------
-      # - name: Terraform Plan
-      #   run: terraform plan
-
-      # -------------------------------
-      # Terraform Apply (DISABLED)
-      # -------------------------------
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve
-
-      # -------------------------------
-      # Terraform Destroy (ENABLED)
-      # -------------------------------
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
+      # - name: Terraform Destroy
+      #   if: ${{ github.event.inputs.action == 'destroy' }}
+      #   run: terraform destroy -auto-approve
