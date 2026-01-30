@@ -3,7 +3,7 @@ terraform {
     bucket         = "bada-terraform-state-bucket"
     key            = "dev/terraform.tfstate"
     region         = "ap-south-1"
-    dynamodb_table = "bada-terraform-state-bucket"
+    dynamodb_table = "my-tab"
     encrypt        = true
   }
 }
